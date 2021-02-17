@@ -18,5 +18,5 @@ setup(
     packages=['connect_appinsights'],
     url='https://github.com/JaviCerveraIngram/connect_appinsights',
     license='Apache Software License',
-    install_requires=['connect-sdk-haxe-port==20.3.0']
+    install_requires=['connect-sdk-haxe-port', 'opencensus-ext-azure==1.0.4', 'opencensus-ext-requests==0.7.3', 'opencensus-ext-logging==0.1.0']
 )
