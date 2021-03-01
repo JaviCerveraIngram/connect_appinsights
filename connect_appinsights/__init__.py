@@ -1,1 +1,2 @@
+from .AzureLoggerFormatter import AzureLoggerFormatter
 from .AzureLoggerWriter import AzureLoggerWriter
