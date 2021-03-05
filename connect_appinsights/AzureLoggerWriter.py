@@ -62,6 +62,27 @@ class AzureLoggerWriter(ILoggerWriter):
         python_level = levels[level] if level in levels else CRITICAL
         self.logger.log(python_level, line, extra=self.extra)
 
+    def copy(self, request: Optional[IdModel]) -> ILoggerWriter:
+        writer = AzureLoggerWriter('')
+        writer._init(self.tracer, self.handler)
+        if request:
+            writer.extra = {
+                'custom_dimensions': {
+                    'Request': request.id,
+                    'Provider': self._get_request_provider_id(request),
+                    'Hub': self._get_request_hub_id(request),
+                    'Marketplace': self._get_request_marketplace_id(request),
+                    'Product': self._get_request_product_id(request),
+                    'TierAccount': self._get_request_tier_account_id(request),
+                    'Connection': self._get_request_connection_id(request),
+                    'Vendor': self._get_request_vendor_id(request),
+                    'ExternalId': self._get_request_external_id(request),
+                }
+            }
+        else:
+            writer.extra = None
+        return writer
+
     @staticmethod
     def _get_request_provider_id(request: Optional[IdModel]) -> Optional[str]:
         provider = request.provider if hasattr(request, 'provider') else \
@@ -73,7 +94,7 @@ class AzureLoggerWriter(ILoggerWriter):
     @staticmethod
     def _get_request_hub_id(request: Optional[IdModel]) -> Optional[str]:
         hub = request.asset.connection.hub if hasattr(request, 'asset') else \
-            request.configuration.connection.provider if hasattr(request, 'configuration') else \
+            request.configuration.connection.hub if hasattr(request, 'configuration') else \
             None
         return hub.id if hub else None
 
@@ -117,27 +138,6 @@ class AzureLoggerWriter(ILoggerWriter):
 
     @staticmethod
     def _get_request_external_id(request: Optional[IdModel]) -> Optional[str]:
-        return request.external_id if hasattr(request, 'external_id') else \
-            request.asset.external_id if hasattr(request, 'asset') else \
+        return request.externalId if hasattr(request, 'externalId') else \
+            request.asset.externalId if hasattr(request, 'asset') else \
             None
-
-    def copy(self, request: Optional[IdModel]) -> ILoggerWriter:
-        writer = AzureLoggerWriter('')
-        writer._init(self.tracer, self.handler)
-        if request:
-            writer.extra = {
-                'custom_dimensions': {
-                    'Request': request.id,
-                    'Provider': self._get_request_provider_id(request),
-                    'Hub': self._get_request_hub_id(request),
-                    'Marketplace': self._get_request_marketplace_id(request),
-                    'Product': self._get_request_product_id(request),
-                    'TierAccount': self._get_request_tier_account_id(request),
-                    'Connection': self._get_request_connection_id(request),
-                    'Vendor': self._get_request_vendor_id(request),
-                    'ExternalId': self._get_request_external_id(request),
-                }
-            }
-        else:
-            writer.extra = None
-        return writer
