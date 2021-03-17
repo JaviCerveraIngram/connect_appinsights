@@ -23,7 +23,7 @@ class AzureLoggerWriter(ILoggerWriter):
     def __init__(self, key: str):
         super().__init__()
         key_prefix = 'InstrumentationKey='
-        key = key if key.startswith(key_prefix) else (key_prefix + key)
+        key = key if key.startswith(key_prefix) or not key else (key_prefix + key)
         self.tracer = None
         self.handler = None
         self.logger = getLogger(self.__class__.LOGGER_NAME)
